@@ -3,7 +3,7 @@ package com.hedera.tutorial.account;
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
-public class CreateAccountTutorial {
+public class CreateAccountSdkTutorial {
     public static void main(String[] args) throws Exception {
         Dotenv dotenv = Dotenv.load();
 

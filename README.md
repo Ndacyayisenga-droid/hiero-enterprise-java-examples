@@ -16,8 +16,8 @@ mvn spring-boot:run
 ## Raw SDK tutorials
 
 ```bash
-mvn exec:java -Dexec.mainClass=com.hedera.tutorial.account.CreateAccountTutorial
-mvn exec:java -Dexec.mainClass=com.hedera.tutorial.topic.CreateTopicTutorial
+mvn exec:java -Dexec.mainClass=com.hedera.tutorial.account.CreateAccountSdkTutorial
+mvn exec:java -Dexec.mainClass=com.hedera.tutorial.topic.CreateTopicSdkTutorial
 ```
 
 Credentials: `.env` (`spring.hiero.*` for Spring, `OPERATOR_ID` / `OPERATOR_KEY` for raw SDK).

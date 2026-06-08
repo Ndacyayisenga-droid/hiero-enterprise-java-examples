@@ -16,7 +16,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
-public class CreateTopicTutorial {
+public class CreateTopicSdkTutorial {
     public static void main(String[] args)
             throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
         Dotenv dotenv = Dotenv.load();
