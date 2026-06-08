@@ -60,15 +60,13 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.hedera.tutorial.CreateTopicApplication</mainClass>
+                    <mainClass>com.hedera.tutorial.TutorialApplication</mainClass>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>com.hedera.tutorial.CreateTopicTutorial</mainClass>
-                </configuration>
+                <version>3.5.0</version>
             </plugin>
         </plugins>
     </build>

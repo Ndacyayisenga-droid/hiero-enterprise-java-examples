@@ -4,10 +4,10 @@ import org.hiero.spring.EnableHiero;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.hedera.tutorial")
 @EnableHiero
-public class CreateTopicApplication {
+public class TutorialApplication {
     public static void main(String[] args) {
-        SpringApplication.run(CreateTopicApplication.class, args);
+        SpringApplication.run(TutorialApplication.class, args);
     }
 }

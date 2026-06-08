@@ -1,4 +1,4 @@
-package com.hedera.tutorial;
+package com.hedera.tutorial.topic;
 
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.SubscriptionHandle;
@@ -9,11 +9,13 @@ import org.hiero.base.TopicClient;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 
 @Component
+@Profile("topic")
 public class CreateTopicEnterpriseRunner implements CommandLineRunner {
     private final TopicClient topicClient;
     private final HieroContext hieroContext;

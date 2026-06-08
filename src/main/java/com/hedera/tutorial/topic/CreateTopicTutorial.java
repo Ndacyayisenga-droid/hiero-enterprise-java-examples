@@ -1,10 +1,10 @@
-package com.hedera.tutorial;
+package com.hedera.tutorial.topic;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TopicMessageQuery;
@@ -17,7 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
 public class CreateTopicTutorial {
-    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args)
+            throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
         Dotenv dotenv = Dotenv.load();
 
         AccountId operatorId = AccountId.fromString(dotenv.get("OPERATOR_ID"));
@@ -37,7 +38,6 @@ public class CreateTopicTutorial {
 
         Thread.sleep(5000);
 
-        assert topicId != null;
         new TopicMessageQuery()
                 .setTopicId(topicId)
                 .subscribe(client, resp -> {
@@ -52,7 +52,7 @@ public class CreateTopicTutorial {
                 .sign(operatorKey)
                 .execute(client);
 
-        TransactionReceipt receipt2 = submitMessage.getReceipt(client);
+        submitMessage.getReceipt(client);
 
         Thread.sleep(30000);
     }
