@@ -3,6 +3,7 @@ package com.hedera.tutorial.topic;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import org.hiero.base.HieroContext;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
@@ -39,13 +40,20 @@ public class CreateTopicEnterpriseRunner implements CommandLineRunner {
 
         Thread.sleep(5000);
 
-        SubscriptionHandle subscription = topicClient.subscribeTopic(
-                topicId,
-                message -> {
-                    String messageAsString = new String(message.contents, StandardCharsets.UTF_8);
-                    System.out.println(
-                            message.consensusTimestamp + " received topic message: " + messageAsString);
-                });
+        // TopicClient has no subscribe API; use the configured Client (same as SDK tutorial).
+        SubscriptionHandle subscription =
+                new TopicMessageQuery()
+                        .setTopicId(topicId)
+                        .subscribe(
+                                hieroContext.getClient(),
+                                message -> {
+                                    String messageAsString =
+                                            new String(message.contents, StandardCharsets.UTF_8);
+                                    System.out.println(
+                                            message.consensusTimestamp
+                                                    + " received topic message: "
+                                                    + messageAsString);
+                                });
 
         topicClient.submitMessage(topicId, operatorKey, "Submitkey set!");
 

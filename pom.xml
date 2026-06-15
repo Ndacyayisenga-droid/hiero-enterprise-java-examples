@@ -18,7 +18,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <hiero.enterprise.version>0.20.0-SNAPSHOT</hiero.enterprise.version>
+        <hiero.enterprise.version>0.20.0</hiero.enterprise.version>
     </properties>
 
     <dependencies>
@@ -42,11 +42,11 @@
         </dependency>
 
         <!-- Raw Hedera SDK tutorial -->
-        <dependency>
-            <groupId>com.hedera.hashgraph</groupId>
-            <artifactId>sdk</artifactId>
-            <version>2.72.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.hedera.hashgraph</groupId>-->
+<!--            <artifactId>sdk</artifactId>-->
+<!--            <version>2.72.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
