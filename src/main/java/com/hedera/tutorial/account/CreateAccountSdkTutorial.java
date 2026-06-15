@@ -50,7 +50,7 @@ public class CreateAccountSdkTutorial {
         AccountInfo accountInfoAfter =
                 new AccountInfoQuery().setAccountId(newAccountId).execute(client);
 
-        System.out.println("\n" + accountInfoAfter);
+        System.out.println("Account updated successfully. New memo: " + accountInfoAfter.accountMemo);
         System.out.println("Account ID: " + newAccountId);
         System.out.println("Account Memo: " + accountInfoAfter.accountMemo);
 

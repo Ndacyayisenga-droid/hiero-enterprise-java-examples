@@ -35,7 +35,7 @@ public class CreateAccountEnterpriseRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Enterprise: create account (auto key, initial balance; no memo on create).
-        Account account = accountClient.createAccount(Hbar.from(100));
+        Account account = accountClient.createAccount(Hbar.from(1));
         System.out.println("Created account ID: " + account.accountId());
         System.out.println("Account private key: " + account.privateKey());
         System.out.println("Account public key: " + account.publicKey());
@@ -54,6 +54,19 @@ public class CreateAccountEnterpriseRunner implements CommandLineRunner {
         System.out.println("Account ID: " + afterUpdate.accountId);
         System.out.println("Memo: " + afterUpdate.accountMemo);
         System.out.println("Balance: " + afterUpdate.balance);
+
+        // Enterprise: transfer HBAR from operator to the created account.
+        Hbar transferAmount = Hbar.from(1);
+        System.out.println("\n=== BEFORE TRANSFER ===");
+        System.out.println("Operator balance: " + accountClient.getOperatorAccountBalance());
+        System.out.println("Account balance: " + accountClient.getAccountBalance(account.accountId()));
+
+        accountClient.transferHbar(account.accountId(), transferAmount);
+
+        System.out.println("\n=== AFTER TRANSFER ===");
+        System.out.println("Transferred: " + transferAmount);
+        System.out.println("Operator balance: " + accountClient.getOperatorAccountBalance());
+        System.out.println("Account balance: " + accountClient.getAccountBalance(account.accountId()));
 
         // Enterprise: delete account; remaining HBAR transferred to operator.
         accountClient.deleteAccount(account);

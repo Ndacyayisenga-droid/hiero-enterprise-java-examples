@@ -2,22 +2,8 @@
 
 ## Spring Boot (enterprise)
 
-Entry point: `com.hedera.tutorial.TutorialApplication`
-
-Set `spring.profiles.active` in `application.properties` (or via `-Dspring.profiles.active=...`):
-
-- `account` — `CreateAccountEnterpriseRunner`
-- `topic` — `CreateTopicEnterpriseRunner`
+How to run the examples:
 
 ```bash
-mvn spring-boot:run
-```
-
-## Raw SDK tutorials
-
-```bash
-mvn exec:java -Dexec.mainClass=com.hedera.tutorial.account.CreateAccountSdkTutorial
-mvn exec:java -Dexec.mainClass=com.hedera.tutorial.topic.CreateTopicSdkTutorial
-```
-
-Credentials: `.env` (`spring.hiero.*` for Spring, `OPERATOR_ID` / `OPERATOR_KEY` for raw SDK).
+ mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=transfer-accounts"
+ ```
