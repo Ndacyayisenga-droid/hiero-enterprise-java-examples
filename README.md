@@ -32,3 +32,27 @@ Delete NFT type (SDK):
 ```bash
 mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.DeleteNftTypeSdkTutorial
 ```
+
+Update NFT type (enterprise — needs local SNAPSHOT with `NftClient.updateNftType`):
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=update-nft-type"
+```
+
+Update NFT type (SDK):
+
+```bash
+mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.UpdateNftTypeSdkTutorial
+```
+
+Update NFT metadata (enterprise — needs local SNAPSHOT with `updateNftMetadata` and create-with-metadata-key):
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=update-nft-metadata"
+```
+
+Update NFT metadata (SDK):
+
+```bash
+mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.UpdateNftMetadataSdkTutorial
+```
