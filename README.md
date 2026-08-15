@@ -56,3 +56,16 @@ Update NFT metadata (SDK):
 ```bash
 mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.UpdateNftMetadataSdkTutorial
 ```
+
+Wipe NFT (enterprise — needs local SNAPSHOT with `NftClient.wipeNft` / `wipeNfts`):
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=wipe-nft"
+```
+
+Wipe NFT (SDK):
+
+```bash
+mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.WipeNftSdkTutorial
+```
+
