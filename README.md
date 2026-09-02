@@ -69,3 +69,27 @@ Wipe NFT (SDK):
 mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.WipeNftSdkTutorial
 ```
 
+Freeze NFT (enterprise — needs local SNAPSHOT with `NftClient.freezeNft` / `unfreezeNft`):
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=freeze-nft"
+```
+
+Freeze NFT (SDK):
+
+```bash
+mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.FreezeNftSdkTutorial
+```
+
+Grant / revoke KYC (enterprise — needs local SNAPSHOT with `NftClient.grantKycNft` / `revokeKycNft`):
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=grant-kyc-nft"
+```
+
+Grant / revoke KYC (SDK):
+
+```bash
+mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.GrantKycNftSdkTutorial
+```
+
