@@ -81,15 +81,15 @@ Freeze NFT (SDK):
 mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.FreezeNftSdkTutorial
 ```
 
-Grant / revoke KYC (enterprise — needs local SNAPSHOT with `NftClient.grantKycNft` / `revokeKycNft`):
+Airdrop NFT (enterprise — needs local SNAPSHOT with `NftClient.airdropNft` / `airdropNfts`):
 
 ```bash
-mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=grant-kyc-nft"
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=airdrop-nft"
 ```
 
-Grant / revoke KYC (SDK):
+Airdrop NFT (SDK):
 
 ```bash
-mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.GrantKycNftSdkTutorial
+mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.AirdropNftSdkTutorial
 ```
 
