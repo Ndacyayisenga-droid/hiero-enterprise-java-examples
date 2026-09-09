@@ -1,17 +1,13 @@
 package com.hedera.tutorial.nft;
 
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.Map;
+import org.hiero.base.AccountClient;
 import org.hiero.base.HieroContext;
 import org.hiero.base.NftClient;
 import org.hiero.base.data.Account;
+import org.hiero.base.protocol.data.AccountInfoResponse;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -20,16 +16,14 @@ import org.springframework.stereotype.Component;
 
 /**
  * Enterprise tutorial for {@link NftClient#airdropNft} / {@link NftClient#airdropNfts} — airdrops
- * NFT serials to a receiver.
+ * NFT serials to one or more receivers.
  *
- * <p>Unlike a standard transfer, if the receiver is not associated and has no available
- * auto-association slots, the airdrop becomes pending instead of failing. This demo creates a
- * receiver with unlimited auto-associations ({@code -1}) via the SDK so the airdrop completes
- * immediately without a prior associate. {@link org.hiero.base.AccountClient#createAccount} does
- * not set max automatic associations yet.
+ * <p>Unlike a standard transfer, if a receiver is not associated and has no available
+ * auto-association slots, the airdrop may become pending rather than failing. This demo associates
+ * receivers first so the airdrops complete immediately using only enterprise clients.
  *
- * <p>Before/after checks use consensus {@link AccountBalanceQuery} (NFT count) and {@link
- * TokenNftInfoQuery} (owner per serial) via {@link HieroContext#getClient()}.
+ * <p>Demonstrates both the single-receiver overload and the map overload that sends different
+ * serials to different accounts in one {@code TokenAirdropTransaction}.
  *
  * @see <a href="https://docs.hedera.com/native/tokens/airdrop">Airdrop a token</a>
  */
@@ -38,14 +32,17 @@ import org.springframework.stereotype.Component;
 public class AirdropNftEnterpriseRunner implements CommandLineRunner {
 
     private final NftClient nftClient;
+    private final AccountClient accountClient;
     private final HieroContext hieroContext;
     private final ConfigurableApplicationContext context;
 
     public AirdropNftEnterpriseRunner(
             NftClient nftClient,
+            AccountClient accountClient,
             HieroContext hieroContext,
             ConfigurableApplicationContext context) {
         this.nftClient = nftClient;
+        this.accountClient = accountClient;
         this.hieroContext = hieroContext;
         this.context = context;
     }
@@ -63,87 +60,39 @@ public class AirdropNftEnterpriseRunner implements CommandLineRunner {
         long serial2 = nftClient.mintNft(tokenId, metadata);
         System.out.println("Minted NFT serials: " + serial1 + ", " + serial2);
 
-        // Receiver with unlimited auto-associations — airdrop completes without associate.
-        PrivateKey receiverKey = PrivateKey.generateED25519();
-        AccountId receiverId =
-                new AccountCreateTransaction()
-                        .setKey(receiverKey)
-                        .setInitialBalance(Hbar.from(1))
-                        .setMaxAutomaticTokenAssociations(-1)
-                        .execute(hieroContext.getClient())
-                        .getReceipt(hieroContext.getClient())
-                        .accountId;
+        // Enterprise: create receivers and associate so airdrops complete immediately.
+        Account alice = accountClient.createAccount(1);
+        Account bob = accountClient.createAccount(1);
+        nftClient.associateNft(tokenId, alice);
+        nftClient.associateNft(tokenId, bob);
+        System.out.println("Created and associated receivers: " + alice.accountId() + ", " + bob.accountId());
 
-        if (receiverId == null) {
-            throw new IllegalStateException("Account create receipt did not contain an account ID");
-        }
-        System.out.println("Created receiver with unlimited auto-associations: " + receiverId);
+        logOwnedNfts("BEFORE AIRDROP", treasury, alice, bob);
 
-        logNfts("BEFORE AIRDROP", tokenId, treasury.accountId(), receiverId, List.of(serial1, serial2));
+        // Enterprise: airdrop one serial to a single receiver.
+        nftClient.airdropNft(tokenId, serial1, treasury, alice.accountId());
+        System.out.println("Airdropped serial " + serial1 + " via NftClient.airdropNft() -> " + alice.accountId());
+        logOwnedNfts("AFTER airdropNft", treasury, alice, bob);
 
-        // Enterprise: airdrop a single serial (operator/treasury is sender).
-        nftClient.airdropNft(tokenId, serial1, treasury, receiverId);
-        System.out.println("Airdropped NFT serial via NftClient.airdropNft(): " + serial1);
-        logNfts(
-                "AFTER airdropNft (serial " + serial1 + ")",
-                tokenId,
-                treasury.accountId(),
-                receiverId,
-                List.of(serial1, serial2));
-
-        // Enterprise: airdrop remaining serials in one call.
-        nftClient.airdropNfts(tokenId, List.of(serial2), treasury, receiverId);
-        System.out.println("Airdropped NFT serial via NftClient.airdropNfts(): " + serial2);
-        logNfts(
-                "AFTER airdropNfts (serial " + serial2 + ")",
-                tokenId,
-                treasury.accountId(),
-                receiverId,
-                List.of(serial1, serial2));
+        // Enterprise: airdrop different serials to different receivers in one call (map overload).
+        nftClient.airdropNfts(tokenId, Map.of(serial2, bob.accountId()), treasury);
+        System.out.println(
+                "Airdropped serial " + serial2 + " via NftClient.airdropNfts(Map) -> " + bob.accountId());
+        logOwnedNfts("AFTER airdropNfts (map)", treasury, alice, bob);
         System.out.println("Airdrop status: SUCCESS");
 
         System.exit(SpringApplication.exit(context, () -> 0));
     }
 
-    private void logNfts(
-            String label,
-            TokenId tokenId,
-            AccountId treasuryId,
-            AccountId receiverId,
-            List<Long> serials)
+    private void logOwnedNfts(String label, Account treasury, Account alice, Account bob)
             throws Exception {
-        var client = hieroContext.getClient();
-        long treasuryBalance =
-                new AccountBalanceQuery()
-                        .setAccountId(treasuryId)
-                        .execute(client)
-                        .tokens
-                        .getOrDefault(tokenId, 0L);
-        long receiverBalance =
-                new AccountBalanceQuery()
-                        .setAccountId(receiverId)
-                        .execute(client)
-                        .tokens
-                        .getOrDefault(tokenId, 0L);
+        AccountInfoResponse treasuryInfo = accountClient.getAccountInfo(treasury.accountId());
+        AccountInfoResponse aliceInfo = accountClient.getAccountInfo(alice.accountId());
+        AccountInfoResponse bobInfo = accountClient.getAccountInfo(bob.accountId());
 
         System.out.println("\n=== " + label + " ===");
-        System.out.println("Treasury " + treasuryId + " NFT balance for " + tokenId + ": " + treasuryBalance);
-        System.out.println("Receiver " + receiverId + " NFT balance for " + tokenId + ": " + receiverBalance);
-        for (long serial : serials) {
-            System.out.println("  serial " + serial + ": " + describeNft(tokenId, serial));
-        }
-    }
-
-    private String describeNft(TokenId tokenId, long serial) {
-        try {
-            var info =
-                    new TokenNftInfoQuery()
-                            .setNftId(tokenId.nft(serial))
-                            .execute(hieroContext.getClient())
-                            .get(0);
-            return "exists, owner=" + info.accountId;
-        } catch (Exception e) {
-            return "query failed: " + e.getClass().getSimpleName();
-        }
+        System.out.println("Treasury " + treasury.accountId() + " ownedNfts: " + treasuryInfo.ownedNfts());
+        System.out.println("Alice    " + alice.accountId() + " ownedNfts: " + aliceInfo.ownedNfts());
+        System.out.println("Bob      " + bob.accountId() + " ownedNfts: " + bobInfo.ownedNfts());
     }
 }

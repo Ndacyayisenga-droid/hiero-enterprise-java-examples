@@ -81,7 +81,7 @@ Freeze NFT (SDK):
 mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.FreezeNftSdkTutorial
 ```
 
-Airdrop NFT (enterprise — needs local SNAPSHOT with `NftClient.airdropNft` / `airdropNfts`):
+Airdrop NFT (enterprise — needs local SNAPSHOT with `NftClient.airdropNft` / `airdropNfts` including map overload):
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=airdrop-nft"
