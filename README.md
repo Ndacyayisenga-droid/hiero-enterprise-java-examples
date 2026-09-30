@@ -93,3 +93,27 @@ Airdrop NFT (SDK):
 mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.AirdropNftSdkTutorial
 ```
 
+Cancel airdrop NFT (enterprise — needs local SNAPSHOT with `NftClient.cancelAirdropNft`):
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=cancel-airdrop-nft"
+```
+
+Cancel airdrop NFT (SDK):
+
+```bash
+mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.CancelAirdropNftSdkTutorial
+```
+
+Reject NFT (enterprise — needs local SNAPSHOT with `NftClient.rejectNft`):
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=reject-nft"
+```
+
+Reject NFT (SDK):
+
+```bash
+mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.RejectNftSdkTutorial
+```
+
