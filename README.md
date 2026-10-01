@@ -117,3 +117,14 @@ Reject NFT (SDK):
 mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.RejectNftSdkTutorial
 ```
 
+Approve NFT allowance (enterprise — needs local SNAPSHOT with `NftClient.approveNftAllowance` / `approveNftAllowances` / `approveNftAllowanceAllSerials`):
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=approve-nft-allowance"
+```
+
+Approve NFT allowance (SDK):
+
+```bash
+mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.ApproveNftAllowanceSdkTutorial
+```
