@@ -35,6 +35,15 @@
             <artifactId>hiero-enterprise-spring</artifactId>
             <version>${hiero.enterprise.version}</version>
         </dependency>
+        <!-- Registers the "hiero-solo-action" network settings (consensus node on
+             127.0.0.1:35211, mirror node on http://localhost:38081) so the enterprise
+             runners can target a local Solo network in CI. -->
+        <dependency>
+            <groupId>org.hiero</groupId>
+            <artifactId>hiero-enterprise-test</artifactId>
+            <version>${hiero.enterprise.version}</version>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty-shaded</artifactId>

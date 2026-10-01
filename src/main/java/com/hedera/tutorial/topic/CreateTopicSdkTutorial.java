@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.tutorial.util.TutorialClient;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.charset.StandardCharsets;
@@ -24,7 +25,7 @@ public class CreateTopicSdkTutorial {
         AccountId operatorId = AccountId.fromString(dotenv.get("OPERATOR_ID"));
         PrivateKey operatorKey = PrivateKey.fromString(dotenv.get("OPERATOR_KEY"));
 
-        Client client = Client.forTestnet();
+        Client client = TutorialClient.forConfiguredNetwork();
         client.setOperator(operatorId, operatorKey);
 
         TransactionResponse txResponse = new TopicCreateTransaction()

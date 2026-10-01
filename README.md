@@ -128,3 +128,42 @@ Approve NFT allowance (SDK):
 ```bash
 mvn -q exec:java -Dexec.mainClass=com.hedera.tutorial.nft.ApproveNftAllowanceSdkTutorial
 ```
+
+---
+
+## Continuous integration
+
+[`.github/workflows/examples.yml`](.github/workflows/examples.yml) runs **every** example on
+each push and pull request — the 14 SDK tutorials and the 15 Spring enterprise profiles —
+against a throwaway Hiero network started by
+[hiero-solo-action](https://github.com/hiero-ledger/hiero-solo-action), so CI needs no testnet
+account and no funded operator.
+
+The job:
+
+1. checks out this repo and `hiero-ledger/hiero-enterprise-java` (the examples depend on a
+   `-SNAPSHOT` that is not published, so the library is built from source and installed),
+2. starts Solo with a mirror node and waits for its REST and REST-Java endpoints,
+3. writes a `.env` pointing at the Solo network, using the account the action generated,
+4. runs `scripts/run-examples.sh`, and uploads each example's log as an artifact.
+
+Run the same suite locally against whatever your `.env` points at:
+
+```bash
+./scripts/run-examples.sh                # every example
+./scripts/run-examples.sh --sdk          # SDK tutorials only
+./scripts/run-examples.sh --enterprise   # Spring runners only
+./scripts/run-examples.sh --only nft     # only examples matching a pattern
+```
+
+The script discovers examples from the sources — any new `*SdkTutorial` class or `@Profile`
+runner is picked up automatically — and prints a pass/fail summary, writing per-example logs to
+`target/example-logs/`.
+
+### Choosing the network
+
+`TutorialClient.forConfiguredNetwork()` builds the SDK client from `HEDERA_NETWORK` (environment
+variable first, then `.env`, falling back to `spring.hiero.network.name`). Recognised values are
+`hedera-testnet` (the default), `hedera-previewnet`, `hedera-mainnet` and `hiero-solo-action`.
+The same `.env` configures the Spring runners through `spring.hiero.*`, so one file switches both
+flavours of example between testnet and a local Solo network.
