@@ -1,6 +1,7 @@
 package com.hedera.tutorial.nft;
 
 import com.hedera.hashgraph.sdk.*;
+import com.hedera.tutorial.util.TutorialClient;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -25,7 +26,7 @@ public class WipeNftSdkTutorial {
         AccountId operatorId = AccountId.fromString(dotenv.get("OPERATOR_ID"));
         PrivateKey operatorKey = PrivateKey.fromString(dotenv.get("OPERATOR_KEY"));
 
-        Client client = Client.forTestnet();
+        Client client = TutorialClient.forConfiguredNetwork();
         client.setOperator(operatorId, operatorKey);
 
         PrivateKey adminKey = operatorKey;
