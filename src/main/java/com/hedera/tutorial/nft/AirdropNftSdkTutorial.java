@@ -1,6 +1,7 @@
 package com.hedera.tutorial.nft;
 
 import com.hedera.hashgraph.sdk.*;
+import com.hedera.tutorial.util.TestnetQueryHelper;
 import com.hedera.tutorial.util.TutorialClient;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +28,7 @@ public class AirdropNftSdkTutorial {
         PrivateKey operatorKey = PrivateKey.fromString(dotenv.get("OPERATOR_KEY"));
 
         Client client = TutorialClient.forConfiguredNetwork();
+        TestnetQueryHelper.tuneClientForTestnet(client);
         client.setOperator(operatorId, operatorKey);
 
         PrivateKey adminKey = operatorKey;
@@ -73,7 +75,9 @@ public class AirdropNftSdkTutorial {
         AccountId bobId = createReceiver(client);
         System.out.println("Created receivers with unlimited auto-associations: " + aliceId + ", " + bobId);
 
-        logNfts(client, "BEFORE AIRDROP", tokenId, operatorId, aliceId, bobId, List.of(serial1, serial2));
+        TestnetQueryHelper.sleepForConsensus();
+        TestnetQueryHelper.logNftOwner("BEFORE AIRDROP (serial " + serial1 + ")", client, tokenId, serial1, operatorId);
+        TestnetQueryHelper.logNftOwner("BEFORE AIRDROP (serial " + serial2 + ")", client, tokenId, serial2, operatorId);
 
         // Step 4: airdrop different serials to different receivers in one transaction.
         Status airdropStatus =
@@ -97,7 +101,12 @@ public class AirdropNftSdkTutorial {
                         + " ("
                         + airdropStatus
                         + ")");
-        logNfts(client, "AFTER AIRDROP", tokenId, operatorId, aliceId, bobId, List.of(serial1, serial2));
+        if (airdropStatus != Status.SUCCESS) {
+            throw new IllegalStateException("Airdrop failed with status " + airdropStatus);
+        }
+        TestnetQueryHelper.sleepForConsensus();
+        TestnetQueryHelper.logNftOwner("AFTER AIRDROP (serial " + serial1 + ")", client, tokenId, serial1, aliceId);
+        TestnetQueryHelper.logNftOwner("AFTER AIRDROP (serial " + serial2 + ")", client, tokenId, serial2, bobId);
         System.out.println("Airdrop status: SUCCESS");
 
         client.close();
@@ -118,45 +127,5 @@ public class AirdropNftSdkTutorial {
             throw new IllegalStateException("Account create receipt did not contain an account ID");
         }
         return receiverId;
-    }
-
-    private static void logNfts(
-            Client client,
-            String label,
-            TokenId tokenId,
-            AccountId treasuryId,
-            AccountId aliceId,
-            AccountId bobId,
-            List<Long> serials)
-            throws Exception {
-        long treasuryBalance = nftBalance(client, treasuryId, tokenId);
-        long aliceBalance = nftBalance(client, aliceId, tokenId);
-        long bobBalance = nftBalance(client, bobId, tokenId);
-
-        System.out.println("\n=== " + label + " ===");
-        System.out.println("Treasury " + treasuryId + " NFT balance for " + tokenId + ": " + treasuryBalance);
-        System.out.println("Alice    " + aliceId + " NFT balance for " + tokenId + ": " + aliceBalance);
-        System.out.println("Bob      " + bobId + " NFT balance for " + tokenId + ": " + bobBalance);
-        for (long serial : serials) {
-            System.out.println("  serial " + serial + ": " + describeNft(client, tokenId, serial));
-        }
-    }
-
-    private static long nftBalance(Client client, AccountId accountId, TokenId tokenId) throws Exception {
-        return new AccountBalanceQuery()
-                .setAccountId(accountId)
-                .execute(client)
-                .tokens
-                .getOrDefault(tokenId, 0L);
-    }
-
-    private static String describeNft(Client client, TokenId tokenId, long serial) {
-        try {
-            TokenNftInfo info =
-                    new TokenNftInfoQuery().setNftId(tokenId.nft(serial)).execute(client).get(0);
-            return "exists, owner=" + info.accountId;
-        } catch (Exception e) {
-            return "query failed: " + e.getClass().getSimpleName();
-        }
     }
 }
