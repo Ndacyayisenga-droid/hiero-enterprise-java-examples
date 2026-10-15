@@ -1,6 +1,7 @@
 package com.hedera.tutorial.account;
 
 import com.hedera.hashgraph.sdk.*;
+import com.hedera.tutorial.util.TutorialClient;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class CreateAccountSdkTutorial {
@@ -14,7 +15,7 @@ public class CreateAccountSdkTutorial {
         AccountId operatorId = AccountId.fromString(dotenv.get("OPERATOR_ID"));
         PrivateKey operatorKey = PrivateKey.fromString(dotenv.get("OPERATOR_KEY"));
 
-        Client client = Client.forTestnet();
+        Client client = TutorialClient.forConfiguredNetwork();
         client.setOperator(operatorId, operatorKey);
 
         AccountCreateTransaction transaction =

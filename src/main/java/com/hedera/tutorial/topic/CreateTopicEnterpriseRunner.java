@@ -1,9 +1,11 @@
 package com.hedera.tutorial.topic;
 
+import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.SubscriptionHandle;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TopicMessageQuery;
+import com.hedera.tutorial.util.TutorialClient;
 import org.hiero.base.HieroContext;
 import org.hiero.base.HieroException;
 import org.hiero.base.TopicClient;
@@ -32,7 +34,7 @@ public class CreateTopicEnterpriseRunner implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws HieroException, InterruptedException {
+    public void run(String... args) throws Exception {
         PrivateKey operatorKey = hieroContext.getOperatorAccount().privateKey();
 
         TopicId topicId = topicClient.createPrivateTopic(operatorKey);
@@ -40,12 +42,19 @@ public class CreateTopicEnterpriseRunner implements CommandLineRunner {
 
         Thread.sleep(5000);
 
-        // TopicClient has no subscribe API; use the configured Client (same as SDK tutorial).
+        // TopicClient has no subscribe API, so the subscription uses the SDK directly. The client
+        // from HieroContext cannot be reused here: its mirror network holds the REST URL
+        // (https://...:443), while a topic subscription needs a mirror gRPC "host:port" target, so
+        // it is built the same way as in the SDK tutorial.
+        Client subscriptionClient = TutorialClient.forConfiguredNetwork();
+        subscriptionClient.setOperator(
+                hieroContext.getOperatorAccount().accountId(), operatorKey);
+
         SubscriptionHandle subscription =
                 new TopicMessageQuery()
                         .setTopicId(topicId)
                         .subscribe(
-                                hieroContext.getClient(),
+                                subscriptionClient,
                                 message -> {
                                     String messageAsString =
                                             new String(message.contents, StandardCharsets.UTF_8);
@@ -59,6 +68,7 @@ public class CreateTopicEnterpriseRunner implements CommandLineRunner {
 
         Thread.sleep(30000);
         subscription.unsubscribe();
+        subscriptionClient.close();
 
         System.exit(SpringApplication.exit(context, () -> 0));
     }
