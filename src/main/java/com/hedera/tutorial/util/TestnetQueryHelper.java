@@ -6,6 +6,9 @@ import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
+import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicInfo;
+import com.hedera.hashgraph.sdk.TopicInfoQuery;
 import com.hedera.hashgraph.sdk.AccountId;
 import java.time.Duration;
 
@@ -40,6 +43,22 @@ public final class TestnetQueryHelper {
             throw new IllegalStateException(
                     "Expected owner " + expectedOwner + " but NFT serial " + serial + " is owned by " + owner);
         }
+    }
+
+    public static TopicInfo queryTopicInfo(Client client, TopicId topicId) throws Exception {
+        return withRetry(() -> new TopicInfoQuery().setTopicId(topicId).execute(client));
+    }
+
+    public static TopicInfo logTopicInfo(String label, Client client, TopicId topicId) throws Exception {
+        TopicInfo info = queryTopicInfo(client, topicId);
+        System.out.println("\n=== " + label + " ===");
+        System.out.println("  memo:               \"" + info.topicMemo + "\"");
+        System.out.println("  admin key:          " + (info.adminKey == null ? "none (immutable)" : "set"));
+        System.out.println("  submit key:         " + (info.submitKey == null ? "none (public)" : "set"));
+        System.out.println("  auto renew account: " + info.autoRenewAccountId);
+        System.out.println("  auto renew period:  " + info.autoRenewPeriod.toDays() + " days");
+        System.out.println("  expiration time:    " + info.expirationTime);
+        return info;
     }
 
     public static void sleepForConsensus() throws InterruptedException {
